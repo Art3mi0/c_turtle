@@ -96,7 +96,7 @@ void get_plan(const ur5e_control::Plan & _data){
 
 
 void initialize_plan(RMLPositionInputParameters  *_IP){
-		_IP->CurrentPositionVector->VecData      [0] =    plan.points[0].linear.x; //x
+		_IP->CurrentPositionVector->VecData      [0] =    5.544445; //x
 
 		_IP->CurrentVelocityVector->VecData      [0] =    0.0;
 
@@ -104,10 +104,10 @@ void initialize_plan(RMLPositionInputParameters  *_IP){
 		_IP->CurrentAccelerationVector->VecData  [0] =    0.0;
 
 
-		_IP->MaxVelocityVector->VecData          [0] =    0.1      ;
+		_IP->MaxVelocityVector->VecData          [0] =    1.0      ;
 
 
-		_IP->MaxAccelerationVector->VecData      [0] =    0.1      ;
+		_IP->MaxAccelerationVector->VecData      [0] =    1.0      ;
 
 
 
@@ -115,7 +115,7 @@ void initialize_plan(RMLPositionInputParameters  *_IP){
 
 
 		//setting the target velocities and positions
-		_IP->TargetPositionVector->VecData       [0] =   plan.points[1].linear.x;
+		_IP->TargetPositionVector->VecData       [0] =   8.0;
 
 
 		_IP->TargetVelocityVector->VecData       [0] =   0.0;
@@ -137,7 +137,7 @@ int main(int argc, char * argv[])
     int loop_freq = 10;
     float dt = (float) 1/loop_freq;
     ros::Rate loop_rate(loop_freq);
-    ros::Publisher reflexxes_pub = nh_.advertise<geometry_msgs::Twist>("/turtle1/cmd_vel",1);
+    ros::Publisher reflexxes_pub = nh_.advertise<geometry_msgs::Twist>("/turtle1/ref",1);
 
     ros::Subscriber plan_sub = nh_.subscribe("/plan",1,get_plan);
     ros::Subscriber pos_sub = nh_.subscribe("/turtle1/pose" ,1, get_pos);
@@ -191,11 +191,11 @@ int main(int argc, char * argv[])
     // Library can be used in a universal way.
 
 	// wait for a plan
-	while (!plan_available){
+	/*while (!plan_available){
 		loop_rate.sleep();
 		
 		ros::spinOnce();
-	}
+	}*/
 	initialize_plan(IP);
 	
     // ********************************************************************
@@ -220,14 +220,14 @@ int main(int argc, char * argv[])
 				printf("An error occurred (%d).\n", ResultValue );
 				break;
 			}
-			if (ResultValue == ReflexxesAPI::RML_FINAL_STATE_REACHED && (ctr <= number_of_points) ){
+			if (ResultValue == ReflexxesAPI::RML_FINAL_STATE_REACHED){// && (ctr <= number_of_points) ){
 				//setting the target velcoity and positions
-				int next_wp;
+				//int next_wp;
 				
-				next_wp = ctr % number_of_points;
-				std::cout << "moving to point:" << next_wp << std::endl;
+				//next_wp = ctr % number_of_points;
+				//std::cout << "moving to point:" << next_wp << std::endl;
 				
-				IP->TargetPositionVector->VecData       [0] =   plan.points[next_wp].linear.x;
+				IP->TargetPositionVector->VecData       [0] =   turtle_pos.x;//plan.points[next_wp].linear.x;
 
 				// update the start point via the current robot positionsn
 				if (turtle_pos_received){
